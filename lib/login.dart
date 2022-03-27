@@ -22,8 +22,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   int activeIndex = 0;
   Future<String> getData() async {
-    var response =
-        await http.post(Uri.parse("http://localhost:8080/questions"));
+    var response = await http.post(Uri.parse("http://localhost:8080/users"));
     print(response.body);
     setState(() {
       // data = jsonDecode(response.body);

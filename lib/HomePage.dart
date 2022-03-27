@@ -4,6 +4,7 @@ import 'dart:html';
 import 'package:flutter/foundation.dart'; // used in test.dart
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'AskQuestions.dart';
 import 'main.dart';
 import 'questions_details.dart';
 
@@ -52,69 +53,88 @@ class HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Questions'),
-      ),
+          backgroundColor: Colors.white,
+          shadowColor: Colors.purple,
+          title: Text(
+            'All Questions',
+            style: TextStyle(color: Colors.black),
+          )),
       body: ListView.builder(
-          itemCount: data == null ? 0 : data.length,
-          itemBuilder: (BuildContext context, int index) {
-            return Card(
-              child: Column(
-                children: [
-                  ListTile(
-                    leading: Icon(Icons.person),
-                    title: TextButton(
-                      style: TextButton.styleFrom(
-                        textStyle:
-                            const TextStyle(fontSize: 20, color: Colors.black),
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => QuestionsDetails(
-                              title: data[index]["title"],
-                              summary: data[index]["summary"],
-                              description: data[index]["description"],
-                              names: data[index]["names"],
-                              date: data[index]["CAST(date AS char)"],
-                            ),
-                          ),
-                        );
-                      },
-                      child: Text(data[index]["title"]),
+        itemCount: data == null ? 0 : data.length,
+        itemBuilder: (BuildContext context, int index) {
+          return Card(
+            child: Column(
+              children: [
+                ListTile(
+                  leading: Icon(Icons.person),
+                  title: TextButton(
+                    style: TextButton.styleFrom(
+                      textStyle:
+                          const TextStyle(fontSize: 20, color: Colors.black),
                     ),
-                    subtitle: Text(
-                      data[index]["summary"],
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => QuestionsDetails(
+                            title: data[index]["title"],
+                            summary: data[index]["summary"],
+                            description: data[index]["description"],
+                            names: data[index]["names"],
+                            date: data[index]["CAST(date AS char)"],
+                          ),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      data[index]["title"],
                       style: TextStyle(color: Colors.black),
                     ),
-                    trailing: Text(data[index]["names"]),
                   ),
-                  // Padding(
-                  //     padding: const EdgeInsets.all(10.0),
-                  //     child: Row(
-                  //       mainAxisAlignment: MainAxisAlignment.start,
-                  //       children: [
-                  //         Text(
-                  //           data[index]["description"],
-                  //           style: TextStyle(color: Colors.black),
-                  //         ),
-                  //       ],
-                  //     )),
-                  Column(
-                    children: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text(data[index]["CAST(date AS char)"]),
-                        ],
-                      ),
-                    ],
+                  subtitle: Text(
+                    data[index]["summary"],
+                    style: TextStyle(color: Colors.black),
                   ),
-                ],
-              ),
-            );
-          }),
+                  trailing: Text(data[index]["names"]),
+                ),
+                // Padding(
+                //     padding: const EdgeInsets.all(10.0),
+                //     child: Row(
+                //       mainAxisAlignment: MainAxisAlignment.start,
+                //       children: [
+                //         Text(
+                //           data[index]["description"],
+                //           style: TextStyle(color: Colors.black),
+                //         ),
+                //       ],
+                //     )),
+                Column(
+                  children: <Widget>[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(data[index]["CAST(date AS char)"]),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          // Add your onPressed code here!
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => AskQuestions()));
+        },
+        label: const Text('Ask Question'),
+        icon: const Icon(Icons.question_answer_sharp),
+        backgroundColor: Colors.purple,
+      ),
     );
   }
 }
