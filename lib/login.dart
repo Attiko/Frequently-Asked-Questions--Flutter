@@ -26,7 +26,7 @@ class _LoginPageState extends State<LoginPage> {
         await http.post(Uri.parse("http://localhost:8080/questions"));
     print(response.body);
     setState(() {
-      data = jsonDecode(response.body);
+      // data = jsonDecode(response.body);
     });
     return "congrat";
   }
