@@ -202,9 +202,9 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 MaterialButton(
                   onPressed: () async {
-                    var response = await http.post(
-                        Uri.parse('http/localhost:8080/users'),
-                        body: {'name': 'doodle', 'color': 'blue'});
+                    // var response = await http.post(
+                    //     Uri.parse('http/localhost:8080/users'),
+                    //     body: {'name': , 'password': ''});
                   },
                   height: 45,
                   color: Colors.black,

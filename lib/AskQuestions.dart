@@ -6,25 +6,8 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:markdown_editable_textinput/format_markdown.dart';
 import 'package:markdown_editable_textinput/markdown_text_input.dart';
 import 'package:http/http.dart' as http;
-
+import 'Asked.dart';
 import 'HomePage.dart';
-// import 'DataModel.dart';
-
-// void main() {
-//   runApp(AskQuestions());
-// }
-
-// // @override
-// // State<AskQuestions> createState() => _AskQuestionsState();
-
-// class AskQuestions extends StatelessWidget {
-//   final myController = TextEditingController();
-//   void initState() {
-//     // super.initState();
-//     myController.addListener(() {
-//       print(myController.text);
-//     });
-//   }
 
 void main() => runApp(AskQuestions());
 
@@ -34,48 +17,7 @@ class AskQuestions extends StatefulWidget {
   _AskQuestionsState createState() => _AskQuestionsState();
 }
 
-class QuestionsModels {
-  QuestionsModels({
-    required this.title,
-    required this.summary,
-    required this.description,
-    // required this.user_id,
-    // required this.date,
-    // required this.created_at,
-    // required this.names,
-  });
-
-  String title;
-  String summary;
-  String description;
-  // String user_id;
-  // String date;
-  // String created_at;
-  // String names;
-
-  factory QuestionsModels.fromJson(Map<String, dynamic> json) =>
-      QuestionsModels(
-        title: json["title"],
-        summary: json["summary"],
-        description: json["description"],
-        // user_id: json["user_id"],
-        // date: json["date"],
-        // created_at: json["created_at"],
-        // names: json["names"],
-      );
-
-  Map<String, dynamic> toJson() => {
-        "title": title,
-        "summary": summary,
-        "description": description,
-        // "user_id": user_id,
-        // "date": date,
-        // "created_at": created_at,
-        // "names": names,
-      };
-}
-
-Future<QuestionsModels> submitData(
+Future<AskedModel?> createQuestion(
   String title,
   String summary,
   String description,
@@ -84,36 +26,40 @@ Future<QuestionsModels> submitData(
   // String created_at,
   // String names,
 ) async {
-  var response =
-      await http.post(Uri.parse("http://localhost:8080/questions"), body: {
-    "title": title,
-    "summary": summary,
-    "description": description,
-    // "user_id": user_id,
-    // "date": date,
-    // "created_at": created_at,
-    // "names": names,
-  });
-
-  var data = response.body;
-  print(data);
-
+  final response = await http.post(
+    Uri.parse("http://localhost:8080/questions"),
+    headers: <String, String>{
+      'Content-type': 'application/json; charset=UTF-8',
+    },
+    body: jsonEncode(<String, String>{
+      "title": title,
+      "summary": summary,
+      "description": description,
+      // "user_id": user_id,
+      // "date": date,
+      // "created_at": created_at,
+      // "names": names,
+    }),
+  );
   if (response.statusCode == 201) {
-    return QuestionsModels.fromJson(jsonDecode(response.body));
-
-    // String responseString = response.body;
-    // dataModelFromJson(responseString);
+    final String responseString = response.body;
+    return askedModelFromJson(responseString);
   } else {
-    throw Exception('Failed to Add question');
+    return null;
   }
 }
 
 class _AskQuestionsState extends State<AskQuestions> {
-  Future<QuestionsModels>? _futureQuestionsModels;
+  late AskedModel _ask;
   String description = 'My great package';
-  TextEditingController titleController = TextEditingController();
-  TextEditingController summaryController = TextEditingController();
-  TextEditingController descriptionController = TextEditingController();
+
+  final TextEditingController titleController = TextEditingController();
+  final TextEditingController summaryController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
+  // final TextEditingController user_idController = TextEditingController();
+  // final TextEditingController dateController = TextEditingController();
+  // final TextEditingController created_atController = TextEditingController();
+  // final TextEditingController namesController = TextEditingController();
 
   TextEditingController controller = TextEditingController();
 
@@ -170,6 +116,7 @@ class _AskQuestionsState extends State<AskQuestions> {
                       height: 30.0,
                     ),
                     TextField(
+                      controller: titleController,
                       cursorColor: Colors.black,
                       decoration: InputDecoration(
                         filled: true,
@@ -184,10 +131,10 @@ class _AskQuestionsState extends State<AskQuestions> {
                           borderRadius: BorderRadius.circular(10.0),
                         ),
                       ),
-                      controller: titleController,
                     ),
                     SizedBox(height: 10),
                     TextField(
+                      controller: summaryController,
                       cursorColor: Colors.black,
                       maxLines: 5,
                       decoration: InputDecoration(
@@ -203,12 +150,11 @@ class _AskQuestionsState extends State<AskQuestions> {
                           borderRadius: BorderRadius.circular(10.0),
                         ),
                       ),
-                      controller: summaryController,
                     ),
                     SizedBox(height: 30),
                     TextField(
-                      obscureText: false,
                       controller: descriptionController,
+                      obscureText: false,
                       cursorColor: Colors.black,
                       maxLines: 1,
                       keyboardType: TextInputType.multiline,
@@ -244,15 +190,15 @@ class _AskQuestionsState extends State<AskQuestions> {
                       height: 50,
                       color: Color.fromARGB(255, 31, 2, 36),
                       onPressed: () async {
-                        String title = titleController.text;
-                        String summary = summaryController.text;
-                        String description = descriptionController.text;
+                        final String title = titleController.text;
+                        final String summary = summaryController.text;
+                        final String description = descriptionController.text;
 
-                        QuestionsModels mydata = await _futureQuestionsModels!;
+                        final AskedModel? ask =
+                            await createQuestion(title, summary, description);
 
                         setState(() {
-                          _futureQuestionsModels =
-                              mydata as Future<QuestionsModels>?;
+                          _ask = ask!;
                         });
                       },
                       child: Text(

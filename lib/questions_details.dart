@@ -62,7 +62,7 @@ class QuestionsDetails extends StatelessWidget {
                   decoration: InputDecoration(
                     labelText: 'Your Answer',
                     filled: true,
-                    fillColor: Color.fromARGB(255, 233, 225, 225),
+                    fillColor: Color.fromARGB(255, 206, 193, 193),
                     border: InputBorder.none,
                     labelStyle: TextStyle(color: Colors.black),
                     focusedBorder: OutlineInputBorder(

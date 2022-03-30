@@ -1,11 +1,9 @@
 import 'dart:convert';
-import 'dart:html';
 
-import 'package:flutter/foundation.dart'; // used in test.dart
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+
 import 'AskQuestions.dart';
-import 'main.dart';
 import 'questions_details.dart';
 
 void main() {
@@ -39,6 +37,14 @@ class HomePageState extends State<HomePage> {
     setState(() {
       data = jsonDecode(response.body);
     });
+
+    var results =
+        await http.get(Uri.parse("http://localhost:8080/answers/1/answers"));
+    print(results.body);
+    setState(() {
+      var x = jsonDecode(response.body);
+    });
+
     return "congrat";
   }
 
@@ -99,17 +105,6 @@ class HomePageState extends State<HomePage> {
                   ),
                   trailing: Text(data[index]["names"]),
                 ),
-                // Padding(
-                //     padding: const EdgeInsets.all(10.0),
-                //     child: Row(
-                //       mainAxisAlignment: MainAxisAlignment.start,
-                //       children: [
-                //         Text(
-                //           data[index]["description"],
-                //           style: TextStyle(color: Colors.black),
-                //         ),
-                //       ],
-                //     )),
                 Column(
                   children: <Widget>[
                     Row(
