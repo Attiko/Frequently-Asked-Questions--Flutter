@@ -1,15 +1,31 @@
 import 'dart:async';
 import 'dart:convert';
-
+// import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:http/http.dart' as http;
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'HomePage.dart';
+import 'loginModel.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  runApp(LoginPage());
+  runApp(MaterialApp(
+      debugShowCheckedModeBanner: false,
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: [
+        const Locale('en', 'US'),
+      ],
+      home: LoginPage()));
 }
 
 class LoginPage extends StatefulWidget {
@@ -20,15 +36,18 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  late LoginModel _ask;
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
   int activeIndex = 0;
-  Future<String> getData() async {
-    var response = await http.post(Uri.parse("http://localhost:8080/users"));
-    print(response.body);
-    setState(() {
-      // data = jsonDecode(response.body);
-    });
-    return "congrat";
-  }
+  // Future<String> getData() async {
+  //   var response = await http.post(Uri.parse("http://localhost:8080/users"));
+  //   print(response.body);
+  //   setState(() {
+  //     // data = jsonDecode(response.body);
+  //   });
+  //   return "congrat";
+  // }
 
   @override
   void initState() {
@@ -110,6 +129,7 @@ class _LoginPageState extends State<LoginPage> {
                   height: 40,
                 ),
                 TextField(
+                  controller: usernameController,
                   cursorColor: Colors.black,
                   decoration: InputDecoration(
                     contentPadding: EdgeInsets.all(0.0),
@@ -148,6 +168,7 @@ class _LoginPageState extends State<LoginPage> {
                   height: 20,
                 ),
                 TextField(
+                  controller: passwordController,
                   cursorColor: Colors.black,
                   decoration: InputDecoration(
                     contentPadding: EdgeInsets.all(0.0),
@@ -200,11 +221,48 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(
                   height: 30,
                 ),
+                TextButton(onPressed: () async {}, child: Text("Press")),
                 MaterialButton(
                   onPressed: () async {
-                    // var response = await http.post(
-                    //     Uri.parse('http/localhost:8080/users'),
-                    //     body: {'name': , 'password': ''});
+                    // Obtain shared preferences.
+                    final prefs = await SharedPreferences.getInstance();
+                    final username = usernameController.text;
+                    final password = passwordController.text;
+                    Future<LoginModel?> loginDetails(
+                      String username,
+                      String password,
+                    ) async {
+                      final response = await http.post(
+                        Uri.parse("http://localhost:8080/users"),
+                        headers: <String, String>{
+                          'Content-type': 'application/json; charset=UTF-8',
+                        },
+                        body: jsonEncode(<String, String>{
+                          "username": username,
+                          "password": password,
+                        }),
+                      );
+                      print(response.body);
+                      if (response.body.contains('yes')) {
+                        // Save an String value to 'action' key.
+                        await prefs.setString('username', username);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => HomePage(),
+                            ));
+                      } else {
+                        Alert(context: context, title: "ERROR", desc: "WRONG")
+                            .show();
+                      }
+                      return loginModelFromJson(response.body);
+                    }
+
+                    final LoginModel? log =
+                        await loginDetails(username, password);
+                    setState(() {
+                      _ask = log!;
+                    });
                   },
                   height: 45,
                   color: Colors.black,

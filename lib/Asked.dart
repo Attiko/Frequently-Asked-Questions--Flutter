@@ -9,16 +9,15 @@ class AskedModel {
   String? title;
   String? summary;
   String? description;
-  int? user_id;
-  int? date;
-  int? created_at;
+
+  String? date;
+  DateTime? created_at;
   String? names;
 
   AskedModel({
     this.title,
     this.summary,
     this.description,
-    this.user_id,
     this.date,
     this.created_at,
     this.names,
@@ -27,7 +26,6 @@ class AskedModel {
         title: json["title"],
         summary: json["summary"],
         description: json["description"],
-        user_id: json["user_id"],
         date: json["date"],
         created_at: json["created_at"],
         names: json["names"],
@@ -37,7 +35,6 @@ class AskedModel {
         "title": title,
         "summary": summary,
         "description": description,
-        "user_id": user_id,
         "date": date,
         "created_at": created_at,
         "names": names,

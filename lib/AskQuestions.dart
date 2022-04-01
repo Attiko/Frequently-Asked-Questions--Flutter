@@ -7,6 +7,8 @@ import 'package:markdown_editable_textinput/format_markdown.dart';
 import 'package:markdown_editable_textinput/markdown_text_input.dart';
 import 'package:http/http.dart' as http;
 import 'Asked.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'HomePage.dart';
 
 void main() => runApp(AskQuestions());
@@ -22,27 +24,28 @@ Future<AskedModel?> createQuestion(
   String summary,
   String description,
   // String user_id,
-  // String date,
-  // String created_at,
-  // String names,
+  String date,
+  // DateTime created_at,
+  String names,
 ) async {
   final response = await http.post(
     Uri.parse("http://localhost:8080/questions"),
     headers: <String, String>{
       'Content-type': 'application/json; charset=UTF-8',
     },
-    body: jsonEncode(<String, String>{
+    body: jsonEncode(<String, dynamic>{
       "title": title,
       "summary": summary,
       "description": description,
-      // "user_id": user_id,
-      // "date": date,
+
+      "date": date,
       // "created_at": created_at,
-      // "names": names,
+      "names": names,
     }),
   );
   if (response.statusCode == 201) {
     final String responseString = response.body;
+    print(responseString);
     return askedModelFromJson(responseString);
   } else {
     return null;
@@ -50,23 +53,37 @@ Future<AskedModel?> createQuestion(
 }
 
 class _AskQuestionsState extends State<AskQuestions> {
+//Passing the current date to string
+
+  String sdate = DateTime.now().toIso8601String();
   late AskedModel _ask;
   String description = 'My great package';
 
+  // declearing the var name username for the login users
+  String? username;
+
+  //Fectchig the user input for the field
   final TextEditingController titleController = TextEditingController();
   final TextEditingController summaryController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
-  // final TextEditingController user_idController = TextEditingController();
-  // final TextEditingController dateController = TextEditingController();
-  // final TextEditingController created_atController = TextEditingController();
-  // final TextEditingController namesController = TextEditingController();
 
   TextEditingController controller = TextEditingController();
+
+  //Using Shared Preference
+  Future<String?> fetchPreferences() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? usename = prefs.getString("username");
+    return usename;
+  }
 
   @override
   void initState() {
     super.initState();
-
+    fetchPreferences().then((value) {
+      setState(() {
+        username = value!;
+      });
+    });
     controller.addListener(() {
       print(controller.text);
     });
@@ -78,9 +95,17 @@ class _AskQuestionsState extends State<AskQuestions> {
       home: Scaffold(
         backgroundColor: Color.fromARGB(255, 231, 226, 226),
         appBar: AppBar(
-            title: Text(
-              'Fequently Ask Questions',
-              style: TextStyle(color: Color.fromARGB(255, 52, 8, 59)),
+            title: Column(
+              children: [
+                Text(
+                  'Fequently Ask Questions',
+                  style: TextStyle(color: Color.fromARGB(255, 52, 8, 59)),
+                ),
+                Text(
+                  username!,
+                  style: TextStyle(color: Colors.black),
+                )
+              ],
             ),
             backgroundColor: Colors.white,
             leading: IconButton(
@@ -152,25 +177,25 @@ class _AskQuestionsState extends State<AskQuestions> {
                       ),
                     ),
                     SizedBox(height: 30),
-                    TextField(
-                      controller: descriptionController,
-                      obscureText: false,
-                      cursorColor: Colors.black,
-                      maxLines: 1,
-                      keyboardType: TextInputType.multiline,
-                      decoration: InputDecoration(
-                        labelText: 'Description',
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: InputBorder.none,
-                        labelStyle: TextStyle(color: Colors.black),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Colors.black, width: 1.5),
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                      ),
-                    ),
+                    // TextField(
+                    //   controller: descriptionController,
+                    //   obscureText: false,
+                    //   cursorColor: Colors.black,
+                    //   maxLines: 1,
+                    //   keyboardType: TextInputType.multiline,
+                    //   decoration: InputDecoration(
+                    //     labelText: 'Description',
+                    //     filled: true,
+                    //     fillColor: Colors.white,
+                    //     border: InputBorder.none,
+                    //     labelStyle: TextStyle(color: Colors.black),
+                    //     focusedBorder: OutlineInputBorder(
+                    //       borderSide:
+                    //           BorderSide(color: Colors.black, width: 1.5),
+                    //       borderRadius: BorderRadius.circular(10.0),
+                    //     ),
+                    //   ),
+                    // ),
                     SizedBox(height: 30.0),
                     MarkdownTextInput(
                       (String value) => setState(() => value = controller.text),
@@ -179,7 +204,7 @@ class _AskQuestionsState extends State<AskQuestions> {
                       label: 'Description',
                       maxLines: 3,
                       actions: MarkdownType.values,
-                      controller: controller,
+                      controller: descriptionController,
                     ),
                     MarkdownBody(
                       data: controller.text,
@@ -193,9 +218,17 @@ class _AskQuestionsState extends State<AskQuestions> {
                         final String title = titleController.text;
                         final String summary = summaryController.text;
                         final String description = descriptionController.text;
-
-                        final AskedModel? ask =
-                            await createQuestion(title, summary, description);
+                        final String date = sdate;
+                        final created_at = DateTime.now();
+                        final String names = username!;
+                        print(names);
+                        final AskedModel? ask = await createQuestion(
+                            title,
+                            summary,
+                            description,
+                            date,
+                            // created_at,
+                            names);
 
                         setState(() {
                           _ask = ask!;

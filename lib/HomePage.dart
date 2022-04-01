@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 
 import 'AskQuestions.dart';
 import 'questions_details.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(
@@ -30,7 +31,7 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   List data = List.filled(0, 0, growable: true);
-
+  String? username;
   Future<String> getData() async {
     var response = await http.get(Uri.parse("http://localhost:8080/questions"));
     print(response.body);
@@ -48,10 +49,21 @@ class HomePageState extends State<HomePage> {
     return "congrat";
   }
 
+  Future<String?> fetchPreferences() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? usename = prefs.getString("username");
+    return usename;
+  }
+
   @override
   void initState() {
     // super.initState();
     // WidgetsBinding.instance?.addPostFrameCallback((_) {
+    fetchPreferences().then((value) {
+      setState(() {
+        username = value!;
+      });
+    });
     getData();
     // });
   }
@@ -63,9 +75,20 @@ class HomePageState extends State<HomePage> {
       appBar: AppBar(
           backgroundColor: Colors.white,
           shadowColor: Colors.purple,
-          title: Text(
-            'All Questions',
-            style: TextStyle(color: Colors.black),
+          title: Column(
+            children: [
+              Text(
+                'All Questions',
+                style: TextStyle(color: Colors.black),
+              ),
+              Text(
+                username!,
+                style: TextStyle(
+                  color: Colors.black,
+                ),
+                textAlign: TextAlign.right,
+              )
+            ],
           )),
       body: ListView.builder(
         itemCount: data == null ? 0 : data.length,
