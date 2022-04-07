@@ -24,6 +24,9 @@ dependencies:
     version: ^0.0.0
   shared_preferences: ^2.0.13
   time_machine: ^0.9.16
+  file_picker: ^4.5.1
+  open_file: ^3.2.1
+  path_provider: ^2.0.9
 
 dev_dependencies:
   flutter_test:

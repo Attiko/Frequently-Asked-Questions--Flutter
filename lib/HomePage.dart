@@ -2,68 +2,56 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
+import 'LoginPage.dart';
 import 'AskQuestions.dart';
 import 'questions_details.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+// import 'trail.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(
-    new MaterialApp(home: new HomePage()),
+    MaterialApp(home: HomePage()),
   );
 }
-
-// class MyApp extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       home: DataFromAPI(),
-//     );
-//   }
-// }
 
 var resultText;
 
 class HomePage extends StatefulWidget {
   @override
-  HomePageState createState() => new HomePageState();
+  HomePageState createState() => HomePageState();
 }
 
 class HomePageState extends State<HomePage> {
   List data = List.filled(0, 0, growable: true);
-  String? username;
+  // String? username;
   Future<String> getData() async {
+    // final SharedPreferences prefs = await SharedPreferences.getInstance();
+    // username = prefs.getString("username");
+    //print(username);
     var response = await http.get(Uri.parse("http://localhost:8080/questions"));
     print(response.body);
     setState(() {
       data = jsonDecode(response.body);
     });
 
-    var results =
-        await http.get(Uri.parse("http://localhost:8080/answers/1/answers"));
-    print(results.body);
-    setState(() {
-      var x = jsonDecode(response.body);
-    });
-
     return "congrat";
   }
 
-  Future<String?> fetchPreferences() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final String? usename = prefs.getString("username");
-    return usename;
-  }
+  // Future<String?> fetchPreferences() async {
+  //   final SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   final String? usename = prefs.getString("username");
+  //   return usename;
+  // }
 
   @override
   void initState() {
     // super.initState();
     // WidgetsBinding.instance?.addPostFrameCallback((_) {
-    fetchPreferences().then((value) {
-      setState(() {
-        username = value!;
-      });
-    });
+    // fetchPreferences().then((value) {
+    //   setState(() {
+    //     username = value!;
+    //   });
+    // });
     getData();
     // });
   }
@@ -81,13 +69,13 @@ class HomePageState extends State<HomePage> {
                 'All Questions',
                 style: TextStyle(color: Colors.black),
               ),
-              Text(
-                username!,
-                style: TextStyle(
-                  color: Colors.black,
-                ),
-                textAlign: TextAlign.right,
-              )
+              // Text(
+              //   username!,
+              //   style: TextStyle(
+              //     color: Colors.black,
+              //   ),
+              //   textAlign: TextAlign.right,
+              // )
             ],
           )),
       body: ListView.builder(
@@ -113,6 +101,7 @@ class HomePageState extends State<HomePage> {
                             description: data[index]["description"],
                             names: data[index]["names"],
                             date: data[index]["CAST(date AS char)"],
+                            // question_id: data[index]["question_id"],
                           ),
                         ),
                       );
@@ -147,7 +136,7 @@ class HomePageState extends State<HomePage> {
         onPressed: () {
           // Add your onPressed code here!
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => AskQuestions()));
+              context, MaterialPageRoute(builder: (context) => LoginPage()));
         },
         label: const Text('Ask Question'),
         icon: const Icon(Icons.question_answer_sharp),
@@ -163,50 +152,3 @@ class Questions {
   Questions(this.title, this.summary, this.description, this.user_id, this.date,
       this.created_at);
 }
-
-
-// builder: (context, AsyncSnapshot snapshot) {
-            //   if (data.length == null) {
-            //     return Container(
-            //       child: Center(
-            //         child: Text('Loading...'),
-            //       ),
-            //     );
-            //   } else
-            //     return ListView.builder(
-            //         itemCount:data.length,
-            //         itemBuilder: (context, i) {
-            //           return ListTile(
-            //             title: Text(data[i]["title"]),
-            //           );
-            //         });
-            // },
-
-             // Future getQuestionData() async {
-  //   final response =
-  //       await http.get(Uri.parse("http://localhost:8080/questions"));
-  //   var jsonData = jsonDecode(response.body);
-  //   List<Questions> questions = [];
-
-  //   for (var q in jsonData) {
-  //     Questions question = Questions(q["title"], q["summary"], q["description"],
-  //         q["user_id"], q["date"], q["created_at"]);
-  //     questions.add(question);
-  //   }
-  //   print(questions.length);
-  //   return questions;
-  // }
-  //  Container(
-      //   child: Card(
-      //     child: FutureBuilder(
-      //       future: getData(),
-      //       builder: (context, ) {
-      //         if (hasData) {
-      //           return Text(data[1][2]);
-      //         } else if (snapshot.hasError) {
-      //           return Text('${snapshot.error}');
-      //         }
-
-      //         // By default, show a loading spinner.
-      //         return const CircularProgressIndicator();
-      //       },

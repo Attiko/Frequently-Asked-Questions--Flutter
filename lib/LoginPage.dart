@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'AskQuestions.dart';
 import 'HomePage.dart';
 import 'loginModel.dart';
 
@@ -168,6 +169,7 @@ class _LoginPageState extends State<LoginPage> {
                   height: 20,
                 ),
                 TextField(
+                  obscureText: true,
                   controller: passwordController,
                   cursorColor: Colors.black,
                   decoration: InputDecoration(
@@ -221,7 +223,6 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(
                   height: 30,
                 ),
-                TextButton(onPressed: () async {}, child: Text("Press")),
                 MaterialButton(
                   onPressed: () async {
                     // Obtain shared preferences.
@@ -249,7 +250,7 @@ class _LoginPageState extends State<LoginPage> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => HomePage(),
+                              builder: (context) => AskQuestions(),
                             ));
                       } else {
                         Alert(context: context, title: "ERROR", desc: "WRONG")

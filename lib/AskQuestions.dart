@@ -7,6 +7,9 @@ import 'package:markdown_editable_textinput/format_markdown.dart';
 import 'package:markdown_editable_textinput/markdown_text_input.dart';
 import 'package:http/http.dart' as http;
 import 'Asked.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'HomePage.dart';
@@ -43,6 +46,7 @@ Future<AskedModel?> createQuestion(
       "names": names,
     }),
   );
+
   if (response.statusCode == 201) {
     final String responseString = response.body;
     print(responseString);
@@ -176,7 +180,7 @@ class _AskQuestionsState extends State<AskQuestions> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 30),
+                    SizedBox(height: 10),
                     // TextField(
                     //   controller: descriptionController,
                     //   obscureText: false,
@@ -196,7 +200,7 @@ class _AskQuestionsState extends State<AskQuestions> {
                     //     ),
                     //   ),
                     // ),
-                    SizedBox(height: 30.0),
+                    SizedBox(height: 10.0),
                     MarkdownTextInput(
                       (String value) => setState(() => value = controller.text),
                       controller.text,
@@ -222,6 +226,7 @@ class _AskQuestionsState extends State<AskQuestions> {
                         final created_at = DateTime.now();
                         final String names = username!;
                         print(names);
+
                         final AskedModel? ask = await createQuestion(
                             title,
                             summary,
@@ -242,6 +247,27 @@ class _AskQuestionsState extends State<AskQuestions> {
                         ),
                       ),
                     ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    ElevatedButton(
+                        style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all<Color>(
+                                Color.fromARGB(255, 35, 23, 37))),
+                        onPressed: () async {
+                          final result = await FilePicker.platform.pickFiles();
+                          if (result == null) return;
+
+                          final file = result.files.first;
+                          openFile(file);
+
+                          print('Name:${file.name}');
+                          print('Bytes:${file.bytes}');
+                          print('Size:${file.size}');
+                          print('Extension:${file.extension}');
+                          print('Path:${file.path}');
+                        },
+                        child: const Text('Upload Files')),
                   ],
                 ),
               ),
@@ -250,5 +276,9 @@ class _AskQuestionsState extends State<AskQuestions> {
         ),
       ),
     );
+  }
+
+  void openFile(PlatformFile file) {
+    OpenFile.open(file.path!);
   }
 }
